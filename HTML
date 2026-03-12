@@ -1,0 +1,188 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SolarCalc - Simulador de Economia Solar</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#141e30,#243b55);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+margin:0;
+}
+
+.container{
+background:rgba(0,0,0,0.7);
+padding:25px;
+border-radius:12px;
+width:95%;
+max-width:500px;
+box-shadow:0 0 20px rgba(0,0,0,0.6);
+}
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+label{
+display:block;
+margin-top:10px;
+}
+
+input{
+width:100%;
+padding:10px;
+border-radius:6px;
+border:none;
+margin-top:5px;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:20px;
+border:none;
+border-radius:6px;
+background:#00c853;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+button:hover{
+background:#00e676;
+}
+
+.result{
+margin-top:20px;
+background:#111;
+padding:15px;
+border-radius:8px;
+}
+
+canvas{
+margin-top:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>☀️ SolarCalc</h1>
+
+<label>Consumo mensal (kWh)</label>
+<input type="number" id="consumo" placeholder="Ex: 400">
+
+<label>Valor do kWh (R$)</label>
+<input type="number" id="tarifa" placeholder="Ex: 0.85">
+
+<label>Custo do sistema solar (R$)</label>
+<input type="number" id="investimento" placeholder="Ex: 20000">
+
+<label>Percentual de economia (%)</label>
+<input type="number" id="economia" value="90">
+
+<button onclick="calcular()">Simular Economia</button>
+
+<div class="result" id="resultado"></div>
+
+<canvas id="grafico"></canvas>
+
+</div>
+
+<script>
+
+let chart;
+
+function calcular(){
+
+let consumo = parseFloat(document.getElementById("consumo").value);
+let tarifa = parseFloat(document.getElementById("tarifa").value);
+let investimento = parseFloat(document.getElementById("investimento").value);
+let economiaPercent = parseFloat(document.getElementById("economia").value);
+
+if(!consumo || !tarifa || !investimento){
+alert("Preencha todos os campos");
+return;
+}
+
+let gastoAtual = consumo * tarifa;
+
+let economiaMensal = gastoAtual * (economiaPercent/100);
+
+let economiaAnual = economiaMensal * 12;
+
+let sistemaKWp = consumo / 120;
+
+let payback = investimento / economiaAnual;
+
+document.getElementById("resultado").innerHTML =
+
+`
+<h3>Resultado da Simulação</h3>
+
+<p>💰 Gasto mensal atual: <b>R$ ${gastoAtual.toFixed(2)}</b></p>
+
+<p>⚡ Economia mensal: <b>R$ ${economiaMensal.toFixed(2)}</b></p>
+
+<p>📅 Economia anual: <b>R$ ${economiaAnual.toFixed(2)}</b></p>
+
+<p>☀️ Sistema necessário: <b>${sistemaKWp.toFixed(2)} kWp</b></p>
+
+<p>⏳ Retorno do investimento: <b>${payback.toFixed(1)} anos</b></p>
+`;
+
+gerarGrafico(economiaAnual);
+
+}
+
+function gerarGrafico(economia){
+
+let anos = [];
+let valores = [];
+
+for(let i=1;i<=10;i++){
+anos.push("Ano "+i);
+valores.push(economia*i);
+}
+
+if(chart){
+chart.destroy();
+}
+
+let ctx = document.getElementById("grafico").getContext("2d");
+
+chart = new Chart(ctx,{
+type:'line',
+data:{
+labels:anos,
+datasets:[{
+label:'Economia acumulada (R$)',
+data:valores,
+borderWidth:3
+}]
+}
+});
+
+}
+
+</script>
+
+</body>
+</html>
+```
